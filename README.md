@@ -5,11 +5,6 @@
 Run the provided scripts in `/monitoring` (to be moved to ansible soon) `cd monitoring && source scripts/create_env.sh prod && source scripts/deploy.sh`
 
 ## Accounts
-
-- Dev   = `274274389940`
-- QA    = `122441943963`
-- Demo  = `476378927390`
-- Prod  = `032372454047`
 - Sandbox = `311084895497`
 
 ## Permissions
