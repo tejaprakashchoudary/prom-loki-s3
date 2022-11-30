@@ -1,0 +1,7 @@
+- Grafana migration from Cloud to AWS cloud is done                                                                        --> Done 
+- Prometheus integrated to Amazon managed prometheus and is working as expected                                            --> Blocked at one point
+- Logs Need to some research on how to store data in S3 rather than filesystem so that we can reduc htp 429 request error  --> Research going on 
+- Alertmanger needs to be enroute, So that logs auding will provide an alert on high usage/error report                    --> Need to implement
+- SNS topic needed to change the name to 'grafana'
+
+v0.0.2

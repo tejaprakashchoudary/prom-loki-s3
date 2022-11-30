@@ -1,0 +1,41 @@
+global:
+  scrape_interval: 60s
+
+# Reading alert rules 
+rule_files:
+ - alert.rules.yml
+
+scrape_configs:
+  - job_name: $NODEEXPORTER_NAME
+    static_configs:
+    - targets: ['$NODEEXPORTER_TARGET']
+      labels:
+        env: $ENVIRON
+        instance: $SERVER
+  
+  - job_name: $CADVISOR_NAME
+    static_configs:
+    - targets: ['$CADVISOR_TARGET']
+      labels:
+        env: $ENVIRON
+        instance: $SERVER
+
+  - job_name: "kafka-broker"
+    static_configs:
+      - targets: ['$KAFKA_TARGET']            #JMX Exposed port
+        labels:
+          env: $ENVIRON
+          instance: $SERVER
+
+remote_write:
+  - url: $PROMETHEUS_REWRITE_URL
+    sigv4:
+      region: $REGION
+      #Need to add access and secret key - No need add role_arn
+      # access_key: <Access_key>
+      # secret_key: <Secret_Key>
+      #role_arn: $PROMETHEUS_ROLE
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500

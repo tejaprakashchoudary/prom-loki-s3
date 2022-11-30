@@ -1,0 +1,56 @@
+template_files:
+  default_template: |
+    {{ define "sns.default.subject" }}[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}]{{ end }}
+    {{ define "__alertmanager" }}AlertManager{{ end }}
+    {{ define "__alertmanagerURL" }}{{ .ExternalURL }}/#/alerts?receiver={{ .Receiver | urlquery }}{{ end }}
+alertmanager_config: |
+  global:
+  templates:
+    - 'default_template'
+  route:
+    receiver: default
+    repeat_interval: 5m
+    routes:
+      - receiver: 'webdev-team'
+        repeat_interval: 5m
+        matchers:
+          - monitor="webdev-team-prom"
+      - receiver: 'data_science-team'
+        repeat_interval: 5m
+        matchers:
+          - monitor="data_science-team-prom"  
+  receivers:
+    - name: 'default'
+      sns_configs:
+      - topic_arn: $DEFAULT_ARN
+        sigv4:
+          region: us-east-1
+          #Cannot set role_arn and api_url
+          #role_arn: arn:aws:iam::<account-id>:role/amp-iamproxy-ingest-role
+        attributes:
+          key: severity
+          value: page
+
+    - name: 'webdev-team'
+      sns_configs:
+      - topic_arn: $WEBDEV_ARN
+      #MS-Teams Channel email or Engineer Email can be whitlisted
+        sigv4:
+          region: us-east-1
+          #Cannot set role_arn and api_url
+          #role_arn: arn:aws:iam::<account-id>:role/amp-iamproxy-ingest-role
+        attributes:
+          key: severity
+          value: page
+
+    - name: 'data_science-team'
+      sns_configs:
+      - topic_arn: $DATA_SCIENCE_ARN
+      #MS-Teams Channel email or Engineer Email can be whitlisted
+        sigv4:
+          region: us-east-1
+          #Cannot set role_arn and api_url
+          #role_arn: arn:aws:iam::<account-id>:role/amp-iamproxy-ingest-role
+        attributes:
+          key: severity
+          value: page

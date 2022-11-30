@@ -1,0 +1,30 @@
+// Attach this role to the user
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "aps: CreateAlertManagerDefinition",
+                "aps: DescribeAlertManagerSilence",
+                "aps: DescribeAlertManagerDefinition",
+                "aps: PutAlertManagerDefinition",
+                "aps: DeleteAlertManagerDefinition",
+                "aps: ListAlerts",
+                "aps: ListRules",
+                "aps: ListAlertManagerReceivers",
+                "aps: ListAlertManagerSilences",
+                "aps: ListAlertManagerAlerts",
+                "aps: ListAlertManagerAlertGroups",
+                "aps: GetAlertManagerStatus",
+                "aps: GetAlertManagerSilence",
+                "aps: ListAlertManagerSilences",
+                "aps: PutAlertManagerSilences",
+                "aps: DeleteAlertManagerSilence",
+                "aps: CreateAlertManagerAlerts"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

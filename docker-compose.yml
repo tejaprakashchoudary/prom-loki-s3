@@ -1,0 +1,84 @@
+version: '3.8'
+
+networks:
+  monitor-net:
+    driver: bridge
+  loki:
+
+volumes:
+    prometheus_data: {}
+    grafana_data: {}
+
+x-defaults: &defaults
+  restart: unless-stopped
+  env_file:
+    - .env
+  
+services:
+  nodeexporter:
+    image: prom/node-exporter:latest
+    container_name: nodeexporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: unless-stopped
+    ports:
+      - ${PORT_NODEEXPORTER}:9100
+    networks:
+      - monitor-net
+    labels:
+      org.label-schema.group: "monitoring"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.43.0
+    container_name: cadvisor
+    privileged: true
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    restart: unless-stopped
+    ports:
+      - ${PORT_CADVISOR}:8080
+    networks:
+      - monitor-net
+    labels:
+      org.label-schema.group: "monitoring"
+
+  prometheus:
+    <<: *defaults
+    image: prom/prometheus:v2.36.2
+    user: root
+    network_mode: host
+    volumes:
+      - ${PWD}/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    depends_on:
+      - cadvisor
+      - nodeexporter
+
+  promtail:
+    <<: *defaults
+    image: grafana/promtail:1.4.1
+    ports:
+      - ${PORT_PROMTAIL}:9080
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ${PWD}/promtail.yml:/etc/promtail/promtail.yml
+    command: -config.file=/etc/promtail/promtail.yml
+    networks:
+      - loki

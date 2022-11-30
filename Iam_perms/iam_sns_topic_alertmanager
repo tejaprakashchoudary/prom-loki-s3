@@ -1,0 +1,26 @@
+{
+  "Version": "2008-10-17",
+  "Id": "__default_policy_ID",
+  "Statement": [
+    {
+      "Sid": "Allow_Publish_Alarms",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "aps.amazonaws.com"
+      },
+      "Action": [
+        "sns:Publish",
+        "sns:GetTopicAttributes"
+      ],
+      "Resource": "arn:aws:sns:us-east-1:<account_id>:<topic_name>",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "<account_id>"
+        },
+        "ArnEquals": {
+          "aws:SourceArn": "<prometheus_workspace_arn>"
+        }
+      }
+    }
+  ]
+}
